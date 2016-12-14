@@ -108,6 +108,7 @@ class Application(Frame):
             for buttons in self.buttons2:
                 if buttons["text"] != 0:
                     buttons.configure(state=NORMAL)
+                else: buttons.configure(state=DISABLED)
             for buttons in self.buttons1:
                 buttons.configure(state=DISABLED)
 
@@ -118,6 +119,7 @@ class Application(Frame):
             for buttons in self.buttons1:
                 if buttons["text"] != 0:
                     buttons.configure(state=NORMAL)
+                else: buttons.configure(state=DISABLED)
             for buttons in self.buttons2:
                 buttons.configure(state=DISABLED)
 
