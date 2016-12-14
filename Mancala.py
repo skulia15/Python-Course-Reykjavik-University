@@ -1,4 +1,6 @@
+import sys
 from tkinter import *
+from tkinter import messagebox
 
 class Application(Frame):
     class Mancala:
@@ -79,16 +81,23 @@ class Application(Frame):
             for fields in range(self.Mancala.BOARD_SIZE):
                 if stones > 0:
                     stones -= 1
+                    neighbor = self.Mancala.BOARD_SIZE - fields - 1
                     if currlane == 1:
-                        self.Mancala.LANE_PLAYER1[fields] += 1
+                        if currlane == self.Mancala.CURRENT_PLAYER and stones == 0 and self.Mancala.LANE_PLAYER1[fields] == 0 and self.Mancala.LANE_PLAYER2[neighbor] != 0:
+                            self.Mancala.GOAL_PLAYER1 += self.Mancala.LANE_PLAYER2[neighbor] + 1
+                            self.Mancala.LANE_PLAYER2[neighbor] = 0
+                        else:
+                            self.Mancala.LANE_PLAYER1[fields] += 1
                     else:
-                        self.Mancala.LANE_PLAYER2[fields] += 1
+                        if currlane == self.Mancala.CURRENT_PLAYER and stones == 0 and self.Mancala.LANE_PLAYER2[fields] == 0 and self.Mancala.LANE_PLAYER1[neighbor] != 0:
+                            self.Mancala.GOAL_PLAYER2 += self.Mancala.LANE_PLAYER1[neighbor] + 1
+                            self.Mancala.LANE_PLAYER1[neighbor] = 0
+                        else:
+                            self.Mancala.LANE_PLAYER2[fields] += 1
 
 
         self.endstuff()
         self.updateboard()
-
-
 
     def endstuff(self):
         # IF EMPTY TAKE SUM OF OPPONENTS BOARD TO OPPONENT
@@ -105,8 +114,8 @@ class Application(Frame):
         for x in range(self.Mancala.BOARD_SIZE):
             self.buttons1[x].configure(text=self.Mancala.LANE_PLAYER1[x])
             self.buttons2[x].configure(text=self.Mancala.LANE_PLAYER2[self.Mancala.BOARD_SIZE-1-x])
-        self.goal1.configure(text="Goal 1: " + str(self.Mancala.GOAL_PLAYER1))
-        self.goal2.configure(text="Goal 2: " + str(self.Mancala.GOAL_PLAYER2))
+        self.goal1.configure(text=str(self.Mancala.GOAL_PLAYER1) + "\n Player 1")
+        self.goal2.configure(text="Player 2\n" + str(self.Mancala.GOAL_PLAYER2))
 
         # UPDATES IF PLAYER 1 IS CURRENT PLAYER
         if self.Mancala.CURRENT_PLAYER == 1:
@@ -134,45 +143,60 @@ class Application(Frame):
 
     def createboard(self, i, middleframe):
         left = Button(middleframe, text=self.Mancala.LANE_PLAYER1[i], bg="lightblue", height=2,\
-                width=10, command=lambda i=i:self.makeMove(i))
+                width=15, activebackground="blue", command=lambda i=i:self.makeMove(i))
         right = Button(middleframe, text=self.Mancala.LANE_PLAYER2[i], bg="pink",\
-                state=DISABLED, height=2, width=10, command=lambda i=i: self.makeMove(5-i))
+                state=DISABLED, height=2, width=15, activebackground="red", command=lambda i=i: self.makeMove(5-i))
         left.grid(row=i, column=0)
         self.buttons1.append(left)
-        right.grid(row=i, column=1)
+        right.grid(row=i, column=2)
         self.buttons2.append(right)
 
     def create_everything(self):
         #middleframe handles grid for fields
         self.configure(bg="white")
         middleframe = Frame(self)
-        middleframe.grid(row=3, column=0, rowspan=3, columnspan=2)
+        middleframe.grid(row=3, column=0, rowspan=1, columnspan=10)
+        #, Image="upvote.png"
         #create goal for Player1
-        self.goal2 = Label(self, text="Goal 2: " + str(self.Mancala.GOAL_PLAYER2), \
-                     height=3, width=30, bg="white")
+        self.goal2 = Label(self, text="Player 2\n" + str(self.Mancala.GOAL_PLAYER2), \
+                     height=3, width=55, bg="white", font=("Comic Sans MS", 14 ,"bold"))
         self.goal2.grid(row=1, column=0, sticky=W+E+N+S)
         for i in range(self.Mancala.BOARD_SIZE):
             self.createboard(i, middleframe)
         #create goal for Player1
-        self.goal1 = Label(self, text="Goal 1: " + str(self.Mancala.GOAL_PLAYER1), height=3, bg="lightblue")
+        self.goal1 = Label(self, text=str(self.Mancala.GOAL_PLAYER1) + "\n Player 1", height=3, width = 55, bg="lightblue", font=("Comic Sans MS", 14 ,"bold"))
         self.goal1.grid(row=7, column=0, sticky=W+E+N+S)
 
     def create_widgets(self):
         def openrules():
-            print("Rulezzz")
+            messagebox.showinfo("Mancala Rules", "Players take turns to play seeds.  To take a turn," +
+            " the player first chooses a non-empty hollow from one of the six in the near row and picks" + 
+            " up all the seeds contained in it.  The player then drops a single seed into the next hollow" +
+            " in an anticlockwise direction, a single seed into the hollow after that and so on until the" +
+            " seeds run out.   This is called \"sowing\" the seeds. When the player reaches the end of a row," +
+            " sowing continues in an anti-clockwise direction in the other row. \n\n"+
+            "When a player picks a hollow with so many seeds (12 or more) that one or more laps is done, the 12th"+
+            " (and 23rd) seed is not played in the originating hollow - the originating hollow is skipped and the" + 
+            " seed is played in the next hollow on.  This means that the originating hollow is always left" +
+            "empty at the end of the turn.\n\n" +
+            "If the last seed is sown in the opponents row and the hollow concerned finishes with 2 or 3 seeds," +
+            " those seeds are captured.  If the hollow that immediately precedes it also contains 2 or 3 seeds," +
+            " these seeds are also captured and so on until a hollow is reached that does not contain 2 or 3 seeds"+
+            " or the end of the opponents row is reached.")
+
         def start_create_everything():
             start.destroy()
             rules.destroy()
             quitb.destroy()
             self.create_everything()
-        start = Button(text="Start", width=30, height=5, command=lambda: start_create_everything())
-        rules = Button(text="Rules", width=30, height=5, command=lambda: openrules())
-        quitb = Button(text="Exit", width=30, height=5, bg= "red", command=lambda: BASE.destroy())
-        start.pack()
-        rules.pack()
-        quitb.pack()
+
+        start = Button(text="Start", bd = 5,width=30, height=5,  font=("Comic Sans MS", 12 ,"bold"), command=lambda: start_create_everything())
+        rules = Button(text="Rules", width=30, height=5, font=("Comic Sans MS", 12 ,"bold"), command=lambda: openrules())
+        quitb = Button(text="Exit", width=30, height=5, font=("Comic Sans MS", 12 ,"bold"), fg= "red", command=lambda: BASE.destroy())
+        start.grid()
+        rules.grid()
+        quitb.grid()
 
 BASE = Tk()
-#BASE.geometry("310x450+500+500")
 APP = Application(master=BASE)
 APP.mainloop()
