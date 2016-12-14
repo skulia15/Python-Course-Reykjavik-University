@@ -8,7 +8,6 @@ class Application(Frame):
         LANE_PLAYER1 = [4 for i in range(BOARD_SIZE)]
         LANE_PLAYER2 = [4 for i in range(BOARD_SIZE)]
         CURRENT_PLAYER = 2
-        GAME_IS_WON = False
 
     buttons1 = []
     buttons2 = []
@@ -45,19 +44,10 @@ class Application(Frame):
         for fields in range(i+1, self.Mancala.BOARD_SIZE):
             if stones > 0:
                 stones -= 1
-                neighbor = self.Mancala.BOARD_SIZE - fields - 1
                 if self.Mancala.CURRENT_PLAYER == 1:
-                    if stones == 0 and self.Mancala.LANE_PLAYER1[fields] == 0 and self.Mancala.LANE_PLAYER2[neighbor] != 0:
-                        self.Mancala.GOAL_PLAYER1 += self.Mancala.LANE_PLAYER2[neighbor] + 1
-                        self.Mancala.LANE_PLAYER2[neighbor] = 0
-                    else:
-                        self.Mancala.LANE_PLAYER1[fields] += 1
+                    self.Mancala.LANE_PLAYER1[fields] += 1
                 else:
-                    if stones == 0 and self.Mancala.LANE_PLAYER2[fields] == 0 and self.Mancala.LANE_PLAYER1[neighbor] != 0:
-                        self.Mancala.GOAL_PLAYER2 += self.Mancala.LANE_PLAYER1[neighbor] + 1
-                        self.Mancala.LANE_PLAYER1[neighbor] = 0
-                    else:
-                        self.Mancala.LANE_PLAYER2[fields] += 1
+                    self.Mancala.LANE_PLAYER2[fields] += 1
 
         # GET NEXT LANE
         currlane = self.Mancala.CURRENT_PLAYER
@@ -80,19 +70,10 @@ class Application(Frame):
             for fields in range(self.Mancala.BOARD_SIZE):
                 if stones > 0:
                     stones -= 1
-                    neighbor = self.Mancala.BOARD_SIZE - fields - 1
                     if currlane == 1:
-                        if currlane == self.Mancala.CURRENT_PLAYER and stones == 0 and self.Mancala.LANE_PLAYER1[fields] == 0 and self.Mancala.LANE_PLAYER2[neighbor] != 0:
-                            self.Mancala.GOAL_PLAYER1 += self.Mancala.LANE_PLAYER2[neighbor] + 1
-                            self.Mancala.LANE_PLAYER2[neighbor] = 0
-                        else:
-                            self.Mancala.LANE_PLAYER1[fields] += 1
+                        self.Mancala.LANE_PLAYER1[fields] += 1
                     else:
-                        if currlane == self.Mancala.CURRENT_PLAYER and stones == 0 and self.Mancala.LANE_PLAYER2[fields] == 0 and self.Mancala.LANE_PLAYER1[neighbor] != 0:
-                            self.Mancala.GOAL_PLAYER2 += self.Mancala.LANE_PLAYER1[neighbor] + 1
-                            self.Mancala.LANE_PLAYER1[neighbor] = 0
-                        else:
-                            self.Mancala.LANE_PLAYER2[fields] += 1
+                        self.Mancala.LANE_PLAYER2[fields] += 1
 
 
         self.endstuff()
@@ -152,7 +133,7 @@ class Application(Frame):
         right.grid(row=i, column=1)
         self.buttons2.append(right)
 
-    def create_widgets(self):
+    def create_everything(self):
         #middleframe handles grid for fields
         self.configure(bg="white")
         middleframe = Frame(self)
@@ -167,7 +148,22 @@ class Application(Frame):
         self.goal1 = Label(self, text="Goal 1: " + str(self.Mancala.GOAL_PLAYER1), height=3, bg="lightblue")
         self.goal1.grid(row=7, column=0, sticky=W+E+N+S)
 
+    def create_widgets(self):
+        def openrules():
+            print("Rulezzz")
+        def start_create_everything():
+            start.destroy()
+            rules.destroy()
+            quitb.destroy()
+            self.create_everything()
+        start = Button(text="Start", width=30, height=5, command=lambda: start_create_everything())
+        rules = Button(text="Rules", width=30, height=5, command=lambda: openrules())
+        quitb = Button(text="Exit", width=30, height=5, bg= "red", command=lambda: BASE.destroy())
+        start.pack()
+        rules.pack()
+        quitb.pack()
+
 BASE = Tk()
-BASE.geometry("210x350+400+400")
+#BASE.geometry("310x450+500+500")
 APP = Application(master=BASE)
 APP.mainloop()
