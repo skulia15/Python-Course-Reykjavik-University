@@ -44,10 +44,19 @@ class Application(Frame):
         for fields in range(i+1, self.Mancala.BOARD_SIZE):
             if stones > 0:
                 stones -= 1
+                neighbor = self.Mancala.BOARD_SIZE - fields - 1
                 if self.Mancala.CURRENT_PLAYER == 1:
-                    self.Mancala.LANE_PLAYER1[fields] += 1
+                    if stones == 0 and self.Mancala.LANE_PLAYER1[fields] == 0 and self.Mancala.LANE_PLAYER2[neighbor] != 0:
+                        self.Mancala.GOAL_PLAYER1 += self.Mancala.LANE_PLAYER2[neighbor] + 1
+                        self.Mancala.LANE_PLAYER2[neighbor] = 0
+                    else:
+                        self.Mancala.LANE_PLAYER1[fields] += 1
                 else:
-                    self.Mancala.LANE_PLAYER2[fields] += 1
+                    if stones == 0 and self.Mancala.LANE_PLAYER2[fields] == 0 and self.Mancala.LANE_PLAYER1[neighbor] != 0:
+                        self.Mancala.GOAL_PLAYER2 += self.Mancala.LANE_PLAYER1[neighbor] + 1
+                        self.Mancala.LANE_PLAYER1[neighbor] = 0
+                    else:
+                        self.Mancala.LANE_PLAYER2[fields] += 1
 
         # GET NEXT LANE
         currlane = self.Mancala.CURRENT_PLAYER
