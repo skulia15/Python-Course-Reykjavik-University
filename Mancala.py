@@ -5,8 +5,8 @@ class Application(Frame):
         GOAL_PLAYER1 = 0
         GOAL_PLAYER2 = 0
         BOARD_SIZE = 6
-        LANE_PLAYER1 = [4, 4, 4, 4, 4, 4]
-        LANE_PLAYER2 = [4, 4, 4, 4, 4, 4]
+        LANE_PLAYER1 = [4 for i in range(BOARD_SIZE)]
+        LANE_PLAYER2 = [4 for i in range(BOARD_SIZE)]
         CURRENT_PLAYER = 2
         GAME_IS_WON = False
 
@@ -19,10 +19,9 @@ class Application(Frame):
         self.create_widgets()
 
     def getWhosTurn(self):
-        if self.Mancala.CURRENT_PLAYER == 2:
-            return 1
-        else:
+        if self.Mancala.CURRENT_PLAYER == 1:
             return 2
+        return 1
 
     def scoregoal(self):
         if self.Mancala.CURRENT_PLAYER == 1:
@@ -30,15 +29,14 @@ class Application(Frame):
         else: self.Mancala.GOAL_PLAYER2 += 1
 
     def makeMove(self, i):
-        #SEE WHO MADE THE TURN
+        # CHANGE CURRENT PLAYER
         self.Mancala.CURRENT_PLAYER = self.getWhosTurn()
-        print("Player "+ str(self.Mancala.CURRENT_PLAYER) + " made a move")
 
-        #FOR PLAYER 1
+        # FOR PLAYER 1
         if self.Mancala.CURRENT_PLAYER == 1:
             stones = self.Mancala.LANE_PLAYER1[i] # GET STONES
             self.Mancala.LANE_PLAYER1[i] = 0
-        #FOR PLAYER 2
+        # FOR PLAYER 2
         else:
             stones = self.Mancala.LANE_PLAYER2[i]
             self.Mancala.LANE_PLAYER2[i] = 0
@@ -51,10 +49,9 @@ class Application(Frame):
                     self.Mancala.LANE_PLAYER1[fields] += 1
                 else:
                     self.Mancala.LANE_PLAYER2[fields] += 1
+
         # GET NEXT LANE
-        if self.Mancala.CURRENT_PLAYER != 1:
-            currlane = 2
-        else: currlane = 1
+        currlane = self.Mancala.CURRENT_PLAYER
 
         while stones:
             # GET NEXT LANE
@@ -66,6 +63,9 @@ class Application(Frame):
             if currlane != self.Mancala.CURRENT_PLAYER:
                 self.scoregoal()
                 stones -= 1
+                # IF WE FINISH AT GOAL GO AGAIN
+                if stones == 0:
+                    self.Mancala.CURRENT_PLAYER = self.getWhosTurn()
 
             # GO THOUGH NEXT LANE
             for fields in range(self.Mancala.BOARD_SIZE):
@@ -76,13 +76,30 @@ class Application(Frame):
                     else:
                         self.Mancala.LANE_PLAYER2[fields] += 1
 
+
+        self.endstuff()
+        self.updateboard()
+
+
+
+    def endstuff(self):
+        # IF EMPTY TAKE SUM OF OPPONENTS BOARD TO OPPONENT
+        zeroboard = [0 for i in range(self.Mancala.BOARD_SIZE)]
+        if self.Mancala.LANE_PLAYER1 == zeroboard:
+            self.Mancala.GOAL_PLAYER2 += sum(self.Mancala.LANE_PLAYER2)
+            self.Mancala.LANE_PLAYER2 = zeroboard
+        elif self.Mancala.LANE_PLAYER2 == zeroboard:
+            self.Mancala.GOAL_PLAYER1 += sum(self.Mancala.LANE_PLAYER1)
+            self.Mancala.LANE_PLAYER1 = [0 for i in range(self.Mancala.BOARD_SIZE)]
+
+    def updateboard(self):
         # UPDATE BOARD
         for x in range(self.Mancala.BOARD_SIZE):
             self.buttons1[x].configure(text=self.Mancala.LANE_PLAYER1[x])
             self.buttons2[x].configure(text=self.Mancala.LANE_PLAYER2[self.Mancala.BOARD_SIZE-1-x])
         self.goal1.configure(text="Goal 1: " + str(self.Mancala.GOAL_PLAYER1))
         self.goal2.configure(text="Goal 2: " + str(self.Mancala.GOAL_PLAYER2))
-        
+
         # UPDATES IF PLAYER 1 IS CURRENT PLAYER
         if self.Mancala.CURRENT_PLAYER == 1:
             self.goal1.configure(bg="white")      # REPAINT BOARD
@@ -103,6 +120,8 @@ class Application(Frame):
                     buttons.configure(state=NORMAL)
             for buttons in self.buttons2:
                 buttons.configure(state=DISABLED)
+
+
     def createboard(self, i, middleframe):
         left = Button(middleframe, text=self.Mancala.LANE_PLAYER1[i], bg="lightblue", height=2,\
                 width=10, command=lambda i=i:self.makeMove(i))
