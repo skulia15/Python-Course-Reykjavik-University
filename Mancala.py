@@ -11,8 +11,8 @@ class Application(Frame):
         GOAL_PLAYER1 = 0
         GOAL_PLAYER2 = 0
         BOARD_SIZE = 6
-        LANE_PLAYER1 = [4 for i in range(BOARD_SIZE)]
-        LANE_PLAYER2 = [4 for i in range(BOARD_SIZE)]
+        LANE_PLAYER1 = [1 for i in range(BOARD_SIZE)]
+        LANE_PLAYER2 = [1 for i in range(BOARD_SIZE)]
         CURRENT_PLAYER = 2
         GAME_IS_WON = False
         GAME_WINNER = None
@@ -128,7 +128,6 @@ class Application(Frame):
             self.seewinner()
         elif nrOfPlayers == 1 and self.Mancala.CURRENT_PLAYER == 1:
             self.compMakeMove()
-
 
     def endstuff(self):
         # IF EMPTY TAKE SUM OF OPPONENTS BOARD TO OPPONENT
