@@ -110,32 +110,46 @@ class Application(Frame):
                         else:
                             self.Mancala.LANE_PLAYER2[fields] += 1
 
-    def colorrange(self, event): # SHOW HOW FAR THE STONES WILL TRAVEL
-        self.recolorrange("purple", "blue", "orange", "red", event.widget.i)
-
     def uncolorrange(self, event): # RESET COLORS FROM LAST FUNCTION
-        self.recolorrange("lightblue", "lightblue", "pink", "pink", event.widget.i)
+        for x in range(self.Mancala.BOARD_SIZE):
+            self.buttons1[x].configure(fg="black", bg="lightblue")
+            self.buttons2[x].configure(fg="black", bg="pink")
+        self.goal1.configure(fg="black", bg="lightblue")
+        self.goal2.configure(fg="black", bg="pink")
+        #self.recolorrange("lightblue", "lightblue", "pink", "pink", event.widget.i)
 
-    def recolorrange(self, col1_1, col1_2, col2_1, col2_2, i):
+    def colorrange(self, event): # SHOW HOW FAR THE STONES WILL TRAVEL
+        if event.widget["state"] == DISABLED:
+            return
+
+        i = event.widget.i
+
         if self.Mancala.CURRENT_PLAYER == 1:
             # NUMBER OF FIELDS THE STONES CAN TRAVEL
             stones = self.Mancala.LANE_PLAYER1[i]
             currlane = 1
             # ORIGINAL FIELD COLORED DIFFERENTLY
-            self.buttons1[i].config(bg=col1_1)
+            self.buttons1[i].configure(fg="white", bg="navy")
         else:
             stones = self.Mancala.LANE_PLAYER2[5-i]
             currlane = 2
-            self.buttons1[i].config(bg=col2_1)
+            self.buttons2[i].configure(fg="white", bg="darkred")
+        if stones > 12:
+            circle = True
+        else:
+            circle = False
 
         # COLOR FIELDS IN THE SAME LANE AS THE ORIGINAL FIELD
-        for fields in range(i+1, self.Mancala.BOARD_SIZE):
-            if stones > 0:
-                stones -= 1
-                if currlane == 1:
-                    self.buttons1[fields].config(bg=col1_2)
-                else:
-                    self.buttons2[5-fields].configure(bg=col2_2)
+        if currlane == 1:
+            for fields in range(i+1, self.Mancala.BOARD_SIZE):
+                if stones > 0:
+                    stones -= 1
+                    self.buttons1[fields].configure(fg="white", bg="blue")
+        else:
+            for fields in range(5-(i-1), self.Mancala.BOARD_SIZE):
+                if stones > 0:
+                    stones -= 1
+                    self.buttons2[5-fields].configure(fg="white", bg="red")
         while stones:
             # GET NEXT LANE
             if currlane == 1:
@@ -143,24 +157,42 @@ class Application(Frame):
             else: currlane = 1
 
             if currlane != self.Mancala.CURRENT_PLAYER: #CHECK IF THE PLAYER WILL SCORE
-                if self.Mancala.CURRENT_PLAYER == 1:
-                    self.goal1.configure(bg=col1_2)
-                else:
-                    self.goal2.configure(bg=col2_2)
                 stones -= 1
+                if stones == 0 and circle:
+                    if self.Mancala.CURRENT_PLAYER == 1:
+                        self.goal1.configure(fg="white", bg="purple")
+                    else:
+                        self.goal2.configure(fg="white", bg="orange")
+                else:
+                    if self.Mancala.CURRENT_PLAYER == 1:
+                        self.goal1.configure(fg="white", bg="blue")
+                    else:
+                        self.goal2.configure(fg="white", bg="red")
+                
 
             # GO THROUGH NEXT LANE
             for fields in range(self.Mancala.BOARD_SIZE):
                 if stones > 0:
                     stones -= 1
-                    if currlane == 1:
-                        self.buttons1[fields].config(bg=col1_2)
+                    if stones == 0 and circle:
+                        if currlane == 1:
+                            self.buttons1[fields].configure(fg="white", bg="purple")
+                        else:
+                            self.buttons2[5-fields].configure(fg="white", bg="orange")     
                     else:
-                        self.buttons2[5-fields].configure(bg=col2_2)
+                        if currlane == 1:
+                            self.buttons1[fields].configure(fg="white", bg="blue")
+                        else:
+                            self.buttons2[5-fields].configure(fg="white", bg="red")
+
+        if self.Mancala.CURRENT_PLAYER == 1:
+            self.buttons1[i].configure(fg="white", bg="navy") #RECOLOR ORIGINAL BUTTON, IN CASE IT WAS OVERWRITTEN
+        else:
+            self.buttons2[i].configure(fg="white", bg="darkred")
 
 
     def makemove(self, i, nrofplayers):
-
+        self.uncolorrange("shithappens") # EXCUSE THE HAX
         # FOR PLAYER 1
         if self.Mancala.CURRENT_PLAYER == 1:
             stones = self.Mancala.LANE_PLAYER1[i] # GET STONES
@@ -196,7 +228,7 @@ class Application(Frame):
             self.Mancala.GOAL_PLAYER1 += sum(self.Mancala.LANE_PLAYER1)
             self.Mancala.LANE_PLAYER1 = [0 for i in range(self.Mancala.BOARD_SIZE)]
             self.Mancala.GAME_IS_WON = True
-        
+
         if self.Mancala.GAME_IS_WON:
             self.Mancala.GAME_WINNER = self.getwinner()
             return True
@@ -215,7 +247,7 @@ class Application(Frame):
         continueButton.destroy()
         self.resetgame()
         self.__init__()
-        
+
     def getwinner(self):
         if self.Mancala.GOAL_PLAYER1 > self.Mancala.GOAL_PLAYER2:
             return 1
@@ -234,8 +266,8 @@ class Application(Frame):
 
         # UPDATES IF PLAYER 1 IS CURRENT PLAYER
         if self.Mancala.CURRENT_PLAYER == 1:
-            self.goal1.configure(bg="white")      # REPAINT BOARD
-            self.goal2.configure(bg="pink")  # REPAINT BOARD
+            self.goal1.configure(fg="black", bg="white")      # REPAINT BOARD
+            self.goal2.configure(fg="black", bg="pink")  # REPAINT BOARD
 
             for buttons in self.buttons2:
                 if buttons["text"] != 0:
@@ -246,8 +278,8 @@ class Application(Frame):
 
         # UPDATES IF PLAYER 2 IS CURRENT PLAYER
         else:
-            self.goal1.configure(bg="lightblue")
-            self.goal2.configure(bg="white")
+            self.goal1.configure(fg="black", bg="lightblue")
+            self.goal2.configure(fg="black", bg="white")
             for buttons in self.buttons1:
                 if buttons["text"] != 0:
                     buttons.configure(state=NORMAL)
@@ -259,12 +291,14 @@ class Application(Frame):
 
     def createboard(self, i, middleframe, nrofplayers):
         middleframe.configure(bg="white")
-        left = Button(middleframe, text=self.Mancala.LANE_PLAYER1[i], bg="lightblue", height=2,\
-                width=15, activebackground="blue", command=lambda i=i: self.makemove(i, nrofplayers))
+        left = Button(middleframe, text=self.Mancala.LANE_PLAYER1[i], bg="lightblue", height=2,
+                      width=15, activebackground="blue",
+                      command=lambda i=i: self.makemove(i, nrofplayers))
         left.i = i
         if nrofplayers == 2:
-            right = Button(middleframe, text=self.Mancala.LANE_PLAYER2[i], bg="pink",\
-                    state=DISABLED, height=2, width=15, activebackground="red", command=lambda i=i: self.makemove(5-i, nrofplayers))
+            right = Button(middleframe, text=self.Mancala.LANE_PLAYER2[i], bg="pink",
+                           state=DISABLED, height=2, width=15, activebackground="red",
+                           command=lambda i=i: self.makemove(5-i, nrofplayers))
             right.bind('<Enter>', self.colorrange)
             right.bind('<Leave>', self.uncolorrange)
         else:
@@ -278,7 +312,6 @@ class Application(Frame):
         self.buttons1.append(left)
         right.grid(row=i, column=1, padx=15)
         self.buttons2.append(right)
-
     def create_everything(self, nrofplayers):
         # MIDDLEFRAME HANDLES GRID FOR FIELDS
         self.configure(bg="white")
