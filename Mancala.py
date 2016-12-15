@@ -127,7 +127,8 @@ class Application(Frame):
         if win:
             self.seewinner()
         elif nrOfPlayers == 1 and self.Mancala.CURRENT_PLAYER == 1:
-            self.compMakeMove()
+            BASE.after(1000, self.compMakeMove)
+
 
     def endstuff(self):
         # IF EMPTY TAKE SUM OF OPPONENTS BOARD TO OPPONENT
@@ -208,13 +209,13 @@ class Application(Frame):
         if nrOfPlayers == 2:
             right = Button(middleframe, text=self.Mancala.LANE_PLAYER2[i], bg="pink",\
                     state=DISABLED, height=2, width=15, activebackground="red", command=lambda i=i: self.makeMove(5-i, nrOfPlayers))
+            right.bind('<Enter>', self.colorPitButtonRight)
+            right.bind('<Leave>', self.uncolorPitButtonRight)
         else:
             right = Button(middleframe, text=self.Mancala.LANE_PLAYER2[i], bg="pink",\
-                    state=DISABLED, height=2, width=15, activebackground="red")
+                    state=DISABLED, height=2, width=15)
         left.bind('<Enter>', self.colorPitButtonLeft)
         left.bind('<Leave>', self.uncolorPitButtonLeft)
-        right.bind('<Enter>', self.colorPitButtonRight)
-        right.bind('<Leave>', self.uncolorPitButtonRight)
 
         left.grid(row=i, column=0, padx=15, pady=2)
         self.buttons1.append(left)
