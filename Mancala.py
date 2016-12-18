@@ -395,23 +395,21 @@ def createMenuBar():
     menubar.add_cascade(label="Help", menu=helpmenu)
 
 def openrules():
-    messagebox.showinfo("Mancala Rules", "Players take turns to play seeds.  To take a turn," +
-    " the player first chooses a non-empty hollow from one of the six in the near row and picks" + 
-    " up all the seeds contained in it.  The player then drops a single seed into the next hollow" +
-    " in an anticlockwise direction, a single seed into the hollow after that and so on until the" +
-    " seeds run out.   This is called \"sowing\" the seeds. When the player reaches the end of a row," +
-    " sowing continues in an anti-clockwise direction in the other row. \n\n"+
-    "When a player picks a hollow with so many seeds (12 or more) that one or more laps is done, the 12th"+
-    " (and 23rd) seed is not played in the originating hollow - the originating hollow is skipped and the" + 
-    " seed is played in the next hollow on.  This means that the originating hollow is always left" +
-    "empty at the end of the turn.\n\n" +
-    "If the last seed is sown in the opponents row and the hollow concerned finishes with 2 or 3 seeds," +
-    " those seeds are captured.  If the hollow that immediately precedes it also contains 2 or 3 seeds," +
-    " these seeds are also captured and so on until a hollow is reached that does not contain 2 or 3 seeds"+
-    " or the end of the opponents row is reached.")
+    messagebox.showinfo("Mancala Rules", "A Mancala board consists of 2 sides of 6 pits, and 2 goals."+
+                        " Each pit contains 4 stones.\nTo take a turn, the player first chooses a"+
+                        " non-empty pit from their side and picks up all the stones contained in it." +
+                        " The player then drops a single stone into the next pit in an anticlockwise" +
+                        " direction, a single stone into the pit after that and so on until the" +
+                        " stones run out. If the player passes their own goal, they drop a stone there as well," +
+                        " but they skip the opponents goal. They then proceed to place the stones in the other lane.\n" +
+                        " If the last stone dropped is in the player's goal, they get a free turn.\nIf the last stone" +
+                        " dropped is in an empty pit on the players side, that stone, and all the stones in the pit" +
+                        " opposite are placed in the player's goal.\nThe game ends when all the pits on one side are empty." +
+                        " All the stones on the opposite side are then placed in the corresponding goal.\nThe winner is" +
+                        " the player with the most stones in their goal when the game ends."
+                        )
 
 BASE = Tk()
-#BASE.geometry("675x475")
 menubar = Menu(BASE)
 createMenuBar()
 BASE.config(menu=menubar)
